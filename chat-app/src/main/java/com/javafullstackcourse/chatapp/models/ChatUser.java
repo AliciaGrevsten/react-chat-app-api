@@ -10,7 +10,7 @@ public class ChatUser {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     public Integer id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     public String username;
 
     @Column(nullable = false)
