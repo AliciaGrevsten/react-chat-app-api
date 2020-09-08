@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 public class UserController {
 
