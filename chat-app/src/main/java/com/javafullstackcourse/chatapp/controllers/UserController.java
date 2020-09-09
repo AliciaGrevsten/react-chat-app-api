@@ -131,4 +131,79 @@ public class UserController {
                 logCommand(cmd);
         return new ResponseEntity<>(cr, resp);
     }
+
+    @PostMapping("/users/login")
+    public ResponseEntity<CommonResponse> loginUser(HttpServletRequest request, @RequestBody ChatUser user) {
+        Command cmd = new Command(request);
+
+        //process
+        CommonResponse cr = new CommonResponse();
+        HttpStatus resp;
+
+        ChatUser fetchedUser = userRepository.getByUsername(user.username);
+
+        if(fetchedUser != null) {
+            if(fetchedUser.password.equals(user.password)) {
+                cr.data = user;
+                cr.message = "User credential approved.";
+                resp = HttpStatus.OK;
+            } else {
+                cr.message = "Username or password is incorrect.";
+                resp = HttpStatus.NOT_FOUND;
+            }
+        } else {
+            cr.message = "Username or password is incorrect.";
+            resp = HttpStatus.NOT_FOUND;
+        }
+
+        //log and return
+        cmd.setResult(resp);
+        Logger.getInstance().
+
+                logCommand(cmd);
+        return new ResponseEntity<>(cr, resp);
+    }
+
+    @PostMapping("/users/register")
+    public ResponseEntity<CommonResponse> registerUser(HttpServletRequest request, @RequestBody ChatUser user) {
+        CommonResponse cr = new CommonResponse();
+        Command cmd = new Command(request);
+        HttpStatus resp;
+
+        ChatUser newUser = new ChatUser();
+
+        if (user.username != null && user.password != null) {
+
+            if(userRepository.getByUsername(user.username) == null) {
+                /*newUser.username = user.username;
+                newUser.password = user.password;
+
+                if (user.profileImage != null) {
+                    newUser.profileImage = user.profileImage;
+                }
+
+                userRepository.save(newUser);*/
+                user = userRepository.save(user);
+
+                cr.data = user;
+                cr.message = "New user with id: " + user.id;
+
+                resp = HttpStatus.CREATED;
+            } else {
+                cr.message = "Username must be unique";
+
+                resp = HttpStatus.BAD_REQUEST;
+            }
+
+        } else {
+            cr.message = "Something went wrong. Invalid request.";
+
+            resp = HttpStatus.BAD_REQUEST;
+        }
+
+        //log and return
+        cmd.setResult(resp);
+        Logger.getInstance().logCommand(cmd);
+        return new ResponseEntity<>(cr, resp);
+    }
 }
